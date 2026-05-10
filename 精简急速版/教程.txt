@@ -1,0 +1,39 @@
+准备工作：
+1、安装9008驱动
+2、安装usb_driver安卓驱动
+
+3、去github下载 OpenStick 基础包
+前往 https://github.com/OpenStick/OpenStick/releases/tag/v1 项目的 v1 发布页，下载以下三个文件：
+base-generic.zip
+boot-uz801.img
+debian.zip
+
+解压 base-generic.zip，进入 base 目录
+
+刷机：
+1、将随身 WiFi 插入电脑
+打开浏览器访问 192.168.100.1/usbdebug.html
+
+2、解压 base-generic.zip，进入 base 目录，进入cmd
+输入 adb devices，确认返回了设备 ID，代表连接成功。
+输入 adb reboot bootloader，设备会重启并进入 Fastboot 模式。
+
+注意：打开 Windows 设备管理器，必须看到设备被识别为 Android 相关的 bootloader 设备。如果有黄色感叹号，需要手动强行更新为安卓驱动。
+强行更新驱动（硬核救场）：用 Zadig 查看该设备的 VID 和 PID。然后用 VSCode 打开 android_winusb.inf，
+找到 [Google.NTamd64] 和 [Google.NTx86] 这两个标签，在它们下方插入以下代码：
+%SingleBootLoaderInterface% = USB_Install, USB\VID_xxxx&PID_xxxx
+%SingleAdbInterface% = USB_Install, USB\VID_xxxx&PID_xxxx
+（把 xxxx 换成你查到的实际值）。保存后，在设备管理器右键该设备 -> 更新驱动程序 -> 浏览我的电脑以查找 -> 强制选择你改好的 inf 文件即可成功装上驱动。）
+[Google.NTx86] 是给 32 位系统看的，[Google.NTamd64] 是给 64 位系统看的
+
+3、刷入底包与系统
+ cmd中用 fastboot devices 命令确认设备处于正常连接状态
+输入flash.bat，启动脚本，需要数次按任意键，直到结束
+
+解压 debian.zip，进入解压出的 debian 目录。
+把下载的 boot-uz801.img 重命名为 boot.img，并将其复制到 debian 目录中，覆盖原有的 boot.img。
+
+双击执行 debian 目录下的 flash.bat 脚本，按提示回车完成系统刷入。
+
+注意：
+砖了用miko service tool pro救，具体问ai，安装后安装目录下粘贴Loader.exe进去双击启动，不然要注册码，会多次报毒关掉安全中心实时监控。
